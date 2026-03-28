@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance — Optiflow Aqua Systems</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="/static/img/Company%20logo.jpeg" alt="Optiflow Logo" class="nav-logo">
+            <span>Optiflow <span class="accent">Aqua Systems</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">📊 Dashboard</a></li>
+            <li><a href="/map">🗺️ Map</a></li>
+            <li><a href="/model" class="active">🤖 Model</a></li>
+            <li><a href="/alerts">🔔 Alerts</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>🤖 ML Model <span class="gradient-text">Performance</span></h1>
+            <p>Comparative evaluation of Random Forest vs Support Vector Regression for soil moisture prediction</p>
+        </div>
+
+        <!-- Best Model Banner -->
+        {% if metrics %}
+        <div class="alert-banner success">
+            <span>🏆</span>
+            <strong>{{ metrics.best_model }}</strong> achieved the highest R² and was selected as the operational model.
+        </div>
+        {% endif %}
+
+        <!-- Comparison Table -->
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-header">
+                <span class="card-title">📋 Metric Comparison</span>
+            </div>
+            {% if metrics %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Random Forest</th>
+                        <th>SVR</th>
+                        <th>Better</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>R²</strong> (Coefficient of Determination)</td>
+                        <td>{{ metrics.random_forest.r2 }}</td>
+                        <td>{{ metrics.svr.r2 }}</td>
+                        <td>
+                            {% if metrics.random_forest.r2 >= metrics.svr.r2 %}
+                            <span class="badge badge-green">RF ✓</span>
+                            {% else %}
+                            <span class="badge badge-blue">SVR ✓</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>RMSE</strong> (Root Mean Squared Error)</td>
+                        <td>{{ metrics.random_forest.rmse }}%</td>
+                        <td>{{ metrics.svr.rmse }}%</td>
+                        <td>
+                            {% if metrics.random_forest.rmse <= metrics.svr.rmse %} <span class="badge badge-green">RF
+                                ✓</span>
+                                {% else %}
+                                <span class="badge badge-blue">SVR ✓</span>
+                                {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>MAE</strong> (Mean Absolute Error)</td>
+                        <td>{{ metrics.random_forest.mae }}%</td>
+                        <td>{{ metrics.svr.mae }}%</td>
+                        <td>
+                            {% if metrics.random_forest.mae <= metrics.svr.mae %} <span class="badge badge-green">RF
+                                ✓</span>
+                                {% else %}
+                                <span class="badge badge-blue">SVR ✓</span>
+                                {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        <div class="grid-2">
+            <!-- R² Comparison Bar Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📊 R² Comparison</span>
+                </div>
+                <div class="chart-container" style="max-height:300px;">
+                    <canvas id="r2Chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Feature Importance -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🔬 Feature Importance (RF)</span>
+                </div>
+                <div class="chart-container" style="max-height:300px;">
+                    <canvas id="featureChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methodology Summary -->
+        <div class="card" style="margin-top:24px;">
+            <div class="card-header">
+                <span class="card-title">📖 Methodology Summary</span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; font-size:0.88rem;">
+                <div>
+                    <h4 style="color:var(--accent-amber); margin-bottom:8px;">Phase I — The Eye</h4>
+                    <p style="color:var(--text-secondary);">
+                        Sentinel-2 MSI Level-2A imagery. Bands B4, B8, B11, B12.
+                        Indices: NDVI, NDWI, SAVI. Cloud masking via SCL.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color:var(--accent-teal); margin-bottom:8px;">Phase II — The Brain</h4>
+                    <p style="color:var(--text-secondary);">
+                        12 features × 480 observations. 70/30 stratified split.
+                        Z-score scaling. Random Forest & SVR with GridSearchCV.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color:var(--accent-green); margin-bottom:8px;">Phase III — The Voice</h4>
+                    <p style="color:var(--text-secondary);">
+                        4-tier threshold classification. Automated email alerts
+                        via SMTP. Interactive Leaflet web dashboard.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Optiflow Aqua Systems &copy; 2025 &mdash; Scikit-learn RF &amp; SVR
+    </div>
+
+    <script>
+        const metrics = {{ metrics| tojson | safe }};
+        const featImp = {{ feature_importance| safe }};
+
+        // R² Comparison
+        new Chart(document.getElementById('r2Chart'), {
+            type: 'bar',
+            data: {
+                labels: ['Random Forest', 'SVR'],
+                datasets: [
+                    {
+                        label: 'R²',
+                        data: [metrics.random_forest.r2, metrics.svr.r2],
+                        backgroundColor: ['rgba(34,197,94,0.7)', 'rgba(59,130,246,0.7)'],
+                        borderColor: ['#22c55e', '#3b82f6'],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                    {
+                        label: 'RMSE',
+                        data: [metrics.random_forest.rmse, metrics.svr.rmse],
+                        backgroundColor: ['rgba(249,115,22,0.5)', 'rgba(249,115,22,0.5)'],
+                        borderColor: ['#f97316', '#f97316'],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#9ca3af', font: { family: 'Inter' } } }
+                },
+                scales: {
+                    x: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(55,65,81,0.3)' } },
+                    y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(55,65,81,0.3)' }, beginAtZero: true },
+                }
+            }
+        });
+
+        // Feature Importance
+        const fLabels = featImp.map(f => f.feature);
+        const fValues = featImp.map(f => f.importance);
+        const fColours = fValues.map((_, i) => {
+            const hue = 30 + (i * 25);
+            return `hsla(${hue}, 80%, 55%, 0.75)`;
+        });
+
+        new Chart(document.getElementById('featureChart'), {
+            type: 'bar',
+            data: {
+                labels: fLabels,
+                datasets: [{
+                    label: 'Importance',
+                    data: fValues,
+                    backgroundColor: fColours,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                },
+                scales: {
+                    x: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(55,65,81,0.3)' }, beginAtZero: true },
+                    y: { ticks: { color: '#9ca3af', font: { family: 'Inter', size: 11 } }, grid: { display: false } },
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

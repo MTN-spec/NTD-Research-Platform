@@ -1,0 +1,15 @@
+{
+  "random_forest": {
+    "model": "Random Forest",
+    "r2": 0.9194,
+    "rmse": 3.0356,
+    "mae": 2.4355
+  },
+  "svr": {
+    "model": "SVR",
+    "r2": 0.8941,
+    "rmse": 3.479,
+    "mae": 2.7495
+  },
+  "best_model": "Random Forest"
+}

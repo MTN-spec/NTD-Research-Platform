@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts — Optiflow Aqua Systems</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="/static/img/Company%20logo.jpeg" alt="Optiflow Logo" class="nav-logo">
+            <span>Optiflow <span class="accent">Aqua Systems</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">📊 Dashboard</a></li>
+            <li><a href="/map">🗺️ Map</a></li>
+            <li><a href="/model">🤖 Model</a></li>
+            <li><a href="/alerts" class="active">🔔 Alerts</a></li>
+            <li><a href="/logout" style="color: var(--accent-red);">🔒 Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>🔔 Irrigation <span class="gradient-text">Alerts</span></h1>
+            <p>Threshold-based alert configuration and notification management</p>
+        </div>
+
+        <!-- Alert Summary -->
+        <div class="grid-4" style="margin-bottom:24px;">
+            <div class="card stat-card">
+                <div class="stat-value green">{{ summary.adequate }}</div>
+                <div class="stat-label">🟢 Adequate</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-value amber">{{ summary.moderate_stress }}</div>
+                <div class="stat-label">🟡 Moderate Stress</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-value orange">{{ summary.critical_stress }}</div>
+                <div class="stat-label">🟠 Critical Stress</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-value red">{{ summary.severe_deficit }}</div>
+                <div class="stat-label">🔴 Severe Deficit</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+
+            <!-- Threshold Configuration -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">⚙️ Moisture Thresholds (VWC %)</span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Min VWC</th>
+                            <th>Max VWC</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, t in thresholds.items() %}
+                        <tr>
+                            <td>
+                                <span style="color:{{ t.colour }}; font-weight:600;">
+                                    {{ t.icon }} {{ t.label }}
+                                </span>
+                            </td>
+                            <td>{{ t.min }}%</td>
+                            <td>{{ t.max }}%</td>
+                            <td>
+                                {% if key == 'adequate' %}
+                                <span class="badge badge-green">No action</span>
+                                {% elif key == 'moderate_stress' %}
+                                <span class="badge badge-amber">Monitor</span>
+                                {% elif key == 'critical_stress' %}
+                                <span class="badge badge-orange">Irrigate 24h</span>
+                                {% else %}
+                                <span class="badge badge-red">Irrigate NOW</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Notification Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📧 Notification Actions</span>
+                </div>
+
+                <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:16px;">
+                    When zones fall below the critical threshold, the system can dispatch
+                    irrigation alerts via email to registered farmers.
+                </p>
+
+                <div style="display:flex; gap:12px; margin-bottom:20px;">
+                    <button class="btn btn-primary" id="btnSimulate" onclick="simulateAlert()">
+                        📧 Simulate Alert
+                    </button>
+                    <button class="btn btn-danger" id="btnSend" onclick="sendAlert()">
+                        🚀 Send Real Alert
+                    </button>
+                </div>
+
+                <!-- Alert Preview -->
+                <div id="alertPreview" style="display:none;">
+                    <div class="card-header" style="margin-top:16px;">
+                        <span class="card-title">📨 Alert Preview</span>
+                    </div>
+                    <div id="alertContent"
+                        style="background:var(--bg-secondary); border-radius:var(--radius-sm); padding:16px; margin-top:8px; font-size:0.85rem;">
+                    </div>
+                </div>
+
+                <!-- Status Message -->
+                <div id="alertStatus" style="display:none;" class="alert-banner"></div>
+            </div>
+        </div>
+
+        <!-- Critical Zones Table -->
+        {% if summary.critical_zones %}
+        <div class="card" style="margin-top:24px;">
+            <div class="card-header">
+                <span class="card-title">🚨 Zones Requiring Immediate Irrigation</span>
+                <span class="badge badge-red">{{ summary.critical_zones|length }} zone(s)</span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Predicted VWC</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for zone in summary.critical_zones %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ zone.latitude }}</td>
+                        <td>{{ zone.longitude }}</td>
+                        <td><strong>{{ zone.predicted_vwc }}%</strong></td>
+                        <td>
+                            {% if zone.predicted_vwc < 15 %} <span class="badge badge-red pulse">🔴 Severe</span>
+                                {% else %}
+                                <span class="badge badge-orange">🟠 Critical</span>
+                                {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="footer">
+        Optiflow Aqua Systems &copy; 2025 &mdash; Automated SMTP Notification Engine
+    </div>
+
+    <script>
+        async function simulateAlert() {
+            const btn = document.getElementById('btnSimulate');
+            btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Simulating...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/alert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: 'simulate' }),
+                });
+                const data = await res.json();
+
+                const preview = document.getElementById('alertPreview');
+                const content = document.getElementById('alertContent');
+                preview.style.display = 'block';
+
+                if (data.email_html) {
+                    content.innerHTML = data.email_html;
+                }
+
+                showStatus('success', '✅ Alert simulated successfully. Preview shown below.');
+            } catch (e) {
+                showStatus('danger', '❌ Error: ' + e.message);
+            } finally {
+                btn.innerHTML = '📧 Simulate Alert';
+                btn.disabled = false;
+            }
+        }
+
+        async function sendAlert() {
+            if (!confirm('This will send a real email alert. Continue?')) return;
+
+            const btn = document.getElementById('btnSend');
+            btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Sending...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/alert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: 'send' }),
+                });
+                const data = await res.json();
+
+                if (data.sent) {
+                    showStatus('success', '✅ Alert sent to: ' + data.recipients.join(', '));
+                } else {
+                    showStatus('warning', '⚠️ ' + (data.reason || 'Could not send email.'));
+                }
+            } catch (e) {
+                showStatus('danger', '❌ Error: ' + e.message);
+            } finally {
+                btn.innerHTML = '🚀 Send Real Alert';
+                btn.disabled = false;
+            }
+        }
+
+        function showStatus(type, message) {
+            const el = document.getElementById('alertStatus');
+            el.className = 'alert-banner ' + type;
+            el.innerHTML = message;
+            el.style.display = 'flex';
+        }
+    </script>
+
+</body>
+
+</html>

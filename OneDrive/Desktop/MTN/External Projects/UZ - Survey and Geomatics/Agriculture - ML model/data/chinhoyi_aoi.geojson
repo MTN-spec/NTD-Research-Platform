@@ -1,0 +1,40 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Chinhoyi Study Area",
+                "description": "Approx 20 km radius around Chinhoyi, Mashonaland West, Zimbabwe",
+                "region": "Natural Farming Region 1"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            29.98,
+                            -17.18
+                        ],
+                        [
+                            30.38,
+                            -17.18
+                        ],
+                        [
+                            30.38,
+                            -17.55
+                        ],
+                        [
+                            29.98,
+                            -17.55
+                        ],
+                        [
+                            29.98,
+                            -17.18
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

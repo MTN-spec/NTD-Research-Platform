@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="GIS-based soil moisture monitoring and automated irrigation alerts for maize farmers in Chinhoyi, Zimbabwe.">
+    <title>Optiflow Aqua Systems</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <!-- ── Navigation ──────────────────────────────────────────────────── -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="/static/img/Company%20logo.jpeg" alt="Optiflow Logo" class="nav-logo">
+            <span>Optiflow <span class="accent">Aqua Systems</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/" class="active">📊 Dashboard</a></li>
+            <li><a href="/alerts">🔔 Alerts</a></li>
+            <li><a href="/logout" style="color: var(--accent-red);">🔒 Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- ── Main Content ────────────────────────────────────────────────── -->
+    <div class="page-container">
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1>🌱 Soil Moisture <span class="gradient-text">Dashboard</span></h1>
+            <p>Real-time monitoring for fields in the designated study area</p>
+        </div>
+
+        <!-- 🌍 Google Earth Engine Web App Link -->
+        <div class="card"
+            style="margin-bottom:24px; border:2px solid rgba(20,184,166,0.6); background: linear-gradient(to right, rgba(20,184,166,0.05), transparent);">
+            <div class="card-header">
+                <span class="card-title" style="font-size: 1.2rem;">🌍 Interactive Earth Engine App</span>
+                <span class="badge badge-green">Live Engine</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:0.95rem; margin-bottom:16px;">
+                Access the full interactive map, draw irrigation zones, and view live satellite imagery directly through
+                our hosted Google Earth Engine Web App. This provides the fastest and most stable connection to the
+                Sentinel-2 catalogue.
+            </p>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <a href="https://ee-mhandutakunda.projects.earthengine.app/view/chinhoyi-irrigation-alert" id="geeAppLink" target="_blank"
+                    class="btn btn-primary"
+                    style="background:linear-gradient(135deg,#22c55e,#14b8a6); text-decoration:none; padding: 12px 24px; font-size: 1rem;">
+                    🚀 Launch Earth Engine App
+                </a>
+            </div>
+        </div>
+
+        <!-- 🖼️ Lightbox Modal -->
+        <div class="gee-lightbox" id="geeLightbox" onclick="closeLightbox()">
+            <div class="gee-lightbox-content" onclick="event.stopPropagation()">
+                <button class="gee-lightbox-close" onclick="closeLightbox()">&times;</button>
+                <img id="lightboxImg" src="" alt="Satellite imagery">
+                <div class="gee-lightbox-caption">
+                    <h3 id="lightboxTitle"></h3>
+                    <p id="lightboxDesc"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+        <div class="footer">
+            Optiflow Aqua Systems &copy; 2025 &mdash;
+            GIS-based Python Application for Soil Moisture Estimation &amp; Automated Irrigation Alerts &mdash;
+            Powered by Google Earth Engine
+        </div>
+
+        <!-- ── Charts JS ───────────────────────────────────────────────────── -->
+        <script>
+
+            // ── Live Satellite Fetch ─────────────────────────────────────────
+            async function fetchLiveData() {
+                const dateVal = document.getElementById('liveDate').value;
+                const btn = document.getElementById('btnFetch');
+                const status = document.getElementById('fetchStatus');
+                const results = document.getElementById('liveResults');
+
+                if (!dateVal) { status.textContent = '⚠️ Please select a date.'; return; }
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;display:inline-block;"></span> Analysing all farm pixels...';
+                status.textContent = '🛰️ Fetching Sentinel-2 imagery & analysing ~80,000 pixels across 16 farms — this may take 60-90 seconds...';
+                results.style.display = 'none';
+
+                try {
+                    const res = await fetch('/api/live-fetch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date: dateVal }),
+                    });
+                    const data = await res.json();
+
+                    if (data.status === 'ok') {
+                        results.style.display = 'block';
+
+                        // Message
+                        const msgEl = document.getElementById('liveMessage');
+                        msgEl.className = 'alert-banner success';
+                        msgEl.innerHTML = `🛰️ <strong>Analysis Complete:</strong> ${data.message}`;
+
+                        // Stats
+                        document.getElementById('liveStats').innerHTML = `
+                            <div class="card stat-card"><div class="stat-value teal">${data.num_pixels.toLocaleString()}</div><div class="stat-label">Pixels Analysed</div></div>
+                            <div class="card stat-card"><div class="stat-value green">${data.num_farms}</div><div class="stat-label">Farms Covered</div></div>
+                            <div class="card stat-card"><div class="stat-value red">${data.num_zones}</div><div class="stat-label">Stress Zones</div></div>
+                            <div class="card stat-card"><div class="stat-value amber">${data.actual_date}</div><div class="stat-label">Image Date</div></div>
+                        `;
+
+                        // KML Download
+                        if (data.kml_ready) {
+                            document.getElementById('kmlDownload').style.display = 'block';
+                        }
+
+                        // Farm Summary Table
+                        if (data.farm_table && data.farm_table.length > 0) {
+                            const tbody = document.getElementById('farmTableBody');
+                            tbody.innerHTML = data.farm_table.map(f => {
+                                const actionColor = f.action === 'Irrigate' ? 'var(--accent-red)' :
+                                    f.action === 'Monitor' ? 'var(--accent-amber)' : 'var(--accent-green)';
+                                const actionIcon = f.action === 'Irrigate' ? '🔴' :
+                                    f.action === 'Monitor' ? '🟡' : '🟢';
+                                return `<tr>
+                                    <td><strong>${f.farm_name}</strong></td>
+                                    <td>${f.total_pixels.toLocaleString()}</td>
+                                    <td>${f.stressed_pixels.toLocaleString()}</td>
+                                    <td><strong style="color:${actionColor}">${f.pct_stressed}%</strong></td>
+                                    <td>${f.mean_vwc}%</td>
+                                    <td>${actionIcon} <strong style="color:${actionColor}">${f.action}</strong></td>
+                                </tr>`;
+                            }).join('');
+                            document.getElementById('farmTableWrap').style.display = 'block';
+                        }
+
+                        // Irrigation Zone Map
+                        document.getElementById('liveMap').innerHTML = data.map_html;
+
+                        // Index Legends
+                        if (data.index_legends && data.index_legends.length > 0) {
+                            const legends = document.getElementById('indexLegendsList');
+                            legends.innerHTML = data.index_legends.map(idx => `
+                                <div class="index-legend-item">
+                                    <div class="index-legend-title">${idx.name}</div>
+                                    <div class="index-legend-label">${idx.label}</div>
+                                    <img src="data:image/png;base64,${idx.colourbar}" class="index-legend-bar" alt="${idx.name} colourbar">
+                                    <div class="index-legend-desc">${idx.desc}</div>
+                                </div>
+                            `).join('');
+                            document.getElementById('indexLegendsWrap').style.display = 'block';
+                        }
+
+                        // 📸 Satellite Imagery Gallery
+                        if (data.imagery && data.imagery.length > 0) {
+                            const grid = document.getElementById('imageryGrid');
+                            grid.innerHTML = data.imagery.map(img => {
+                                const icon = img.key === 'rgb' ? '🌍' :
+                                    img.key === 'false_colour' ? '🔴' :
+                                        img.key === 'ndvi' ? '🌿' :
+                                            img.key === 'ndwi' ? '💧' :
+                                                img.key === 'savi' ? '🌾' :
+                                                    img.key === 'msi' ? '🌡️' : '📊';
+                                return `
+                                <div class="gee-thumb" onclick="openLightbox('${img.url}', '${img.label}', '${img.desc}')">
+                                    <div class="gee-thumb-img-wrap">
+                                        <img src="${img.url}" alt="${img.label}" loading="lazy">
+                                        <div class="gee-thumb-overlay">
+                                            <span>🔍 View Full Size</span>
+                                        </div>
+                                    </div>
+                                    <div class="gee-thumb-info">
+                                        <span class="gee-thumb-icon">${icon}</span>
+                                        <span class="gee-thumb-label">${img.label}</span>
+                                    </div>
+                                    <div class="gee-thumb-desc">${img.desc}</div>
+                                </div>
+                                `;
+                            }).join('');
+                            document.getElementById('imageryDate').textContent = data.actual_date;
+                            document.getElementById('imageryGalleryWrap').style.display = 'block';
+                        }
+
+                        status.textContent = `✅ Done — ${data.num_pixels.toLocaleString()} pixels, ${data.num_zones} irrigation zones identified`;
+                    } else {
+                        results.style.display = 'block';
+                        const msgEl = document.getElementById('liveMessage');
+                        msgEl.className = 'alert-banner warning';
+                        msgEl.innerHTML = `⚠️ ${data.message || 'No image found for this date.'}`;
+                        document.getElementById('liveStats').innerHTML = '';
+                        document.getElementById('liveMap').innerHTML = '';
+                        document.getElementById('kmlDownload').style.display = 'none';
+                        document.getElementById('farmTableWrap').style.display = 'none';
+                        document.getElementById('indexLegendsWrap').style.display = 'none';
+                        document.getElementById('imageryGalleryWrap').style.display = 'none';
+                        status.textContent = '⚠️ ' + (data.message || 'No image available.');
+                    }
+                } catch (e) {
+                    status.textContent = '❌ Error: ' + e.message;
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '🛠️ Fetch Satellite Data';
+                }
+            }
+
+            // 🖼️ Lightbox
+            function openLightbox(url, title, desc) {
+                document.getElementById('lightboxImg').src = url;
+                document.getElementById('lightboxTitle').textContent = title;
+                document.getElementById('lightboxDesc').textContent = desc;
+                document.getElementById('geeLightbox').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeLightbox() {
+                document.getElementById('geeLightbox').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Close on Escape key
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') closeLightbox();
+            });
+
+            // ── Satellite Connection Status ─────────────────────────────────
+            async function checkSatelliteStatus() {
+                const dot = document.getElementById('satDot');
+                const text = document.getElementById('satStatusText');
+                const details = document.getElementById('satDetails');
+                const btn = document.getElementById('btnRecheck');
+
+                dot.className = 'sat-dot checking';
+                text.innerHTML = '🟡 Checking connection…';
+                details.style.display = 'none';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/satellite-status');
+                    const data = await res.json();
+
+                    if (data.connected) {
+                        dot.className = 'sat-dot connected';
+                        text.innerHTML = '🟢 Connected to Sentinel-2 Catalogue';
+                        document.getElementById('satCatalogue').textContent = data.catalogue || 'Planetary Computer';
+                        document.getElementById('satLatency').textContent = `⏱ ${data.response_time_ms} ms`;
+                        document.getElementById('satCollections').textContent = `📦 ${data.collections_available} collections`;
+                        details.style.display = 'flex';
+                    } else {
+                        dot.className = 'sat-dot disconnected';
+                        text.innerHTML = `🔴 Disconnected — ${data.error || 'Cannot reach catalogue'}`;
+                        details.style.display = 'none';
+                    }
+                } catch (e) {
+                    dot.className = 'sat-dot disconnected';
+                    text.innerHTML = '🔴 Connection failed — network error';
+                    details.style.display = 'none';
+                } finally {
+                    btn.disabled = false;
+                }
+            }
+
+            // Auto-check on page load
+            checkSatelliteStatus();
+        </script>
+
+</body>
+
+</html>

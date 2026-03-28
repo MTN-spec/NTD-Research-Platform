@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map — Optiflow Aqua Systems</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="/static/img/Company%20logo.jpeg" alt="Optiflow Logo" class="nav-logo">
+            <span>Optiflow <span class="accent">Aqua Systems</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">📊 Dashboard</a></li>
+            <li><a href="/map" class="active">🗺️ Map</a></li>
+            <li><a href="/model">🤖 Model</a></li>
+            <li><a href="/alerts">🔔 Alerts</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container map-fullscreen">
+        <div class="page-header">
+            <h1>🗺️ Interactive <span class="gradient-text">Moisture Map</span></h1>
+            <p>Full-screen view of predicted soil moisture levels across the study area &mdash; {{ latest_date
+                }}</p>
+        </div>
+
+        <div class="threshold-legend" style="margin-bottom:16px;">
+            <div class="threshold-item">
+                <div class="threshold-dot" style="background:#22c55e;"></div> 🟢 Adequate (&gt;35%)
+            </div>
+            <div class="threshold-item">
+                <div class="threshold-dot" style="background:#eab308;"></div> 🟡 Moderate (25–35%)
+            </div>
+            <div class="threshold-item">
+                <div class="threshold-dot" style="background:#f97316;"></div> 🟠 Critical (15–25%)
+            </div>
+            <div class="threshold-item">
+                <div class="threshold-dot" style="background:#ef4444;"></div> 🔴 Severe (&lt;15%)
+            </div>
+        </div>
+
+        <div class="map-container">
+            {{ map_html|safe }}
+        </div>
+    </div>
+
+    <div class="footer">
+        Optiflow Aqua Systems &copy; 2025 &mdash; Sentinel-2 MSI + ML Prediction
+    </div>
+
+</body>
+
+</html>
