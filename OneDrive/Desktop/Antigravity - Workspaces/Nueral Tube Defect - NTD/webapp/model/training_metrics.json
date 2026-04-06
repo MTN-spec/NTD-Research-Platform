@@ -1,0 +1,46 @@
+{
+  "best_model": {
+    "name": "Random Forest",
+    "accuracy": 0.69,
+    "precision": 0.645,
+    "recall": 0.5099,
+    "f1_score": 0.5695,
+    "auc_roc": 0.7414
+  },
+  "all_models": [
+    {
+      "name": "Random Forest",
+      "accuracy": 0.69,
+      "precision": 0.645,
+      "recall": 0.5099,
+      "f1_score": 0.5695,
+      "auc_roc": 0.7414
+    },
+    {
+      "name": "XGBoost",
+      "accuracy": 0.682,
+      "precision": 0.6118,
+      "recall": 0.5731,
+      "f1_score": 0.5918,
+      "auc_roc": 0.7312
+    }
+  ],
+  "cross_validation": {
+    "random_forest": {
+      "mean_auc": 0.7485,
+      "std_auc": 0.0252
+    },
+    "xgboost": {
+      "mean_auc": 0.7355,
+      "std_auc": 0.0216
+    }
+  },
+  "dataset": {
+    "total_samples": 2514,
+    "total_features": 49,
+    "class_distribution": {
+      "0": 1501,
+      "1": 1013
+    }
+  }
+}

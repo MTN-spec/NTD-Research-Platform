@@ -1,0 +1,369 @@
+{
+  "model_type": "Random Forest",
+  "feature_names": [
+    "Unnamed: 0",
+    "MTHFR_C677T",
+    "MTHFR_A1298C",
+    "MTHFD1_R653Q",
+    "MTR_A2756G",
+    "MTRR_A66G",
+    "CBS_844ins68",
+    "DHFR_19del",
+    "FOLR1_var1",
+    "TCN2_C776G",
+    "SHMT1_C1420T",
+    "VANGL1_var1",
+    "VANGL1_var2",
+    "VANGL2_var1",
+    "VANGL2_var2",
+    "CELSR1_var1",
+    "CELSR1_var2",
+    "SCRIB_var1",
+    "FZD6_var1",
+    "DVL2_var1",
+    "PRICKLE1_var1",
+    "WNT3A_var1",
+    "WNT5A_var1",
+    "PAX3_var1",
+    "SHH_var1",
+    "T_BRACHYURY",
+    "GRHL3_var1",
+    "ZIC2_var1",
+    "TBXT_var1",
+    "MTHFR_expr",
+    "MTHFD1_expr",
+    "DHFR_expr",
+    "FOLR1_expr",
+    "VANGL1_expr",
+    "VANGL2_expr",
+    "CELSR1_expr",
+    "SCRIB_expr",
+    "PAX3_expr",
+    "SHH_expr",
+    "WNT3A_expr",
+    "WNT5A_expr",
+    "GRHL3_expr",
+    "ZIC2_expr",
+    "FZD6_expr",
+    "NODAL_expr",
+    "LEFTY2_expr",
+    "FOXE1_expr",
+    "PTCH1_expr",
+    "GLI3_expr"
+  ],
+  "snp_features": [
+    "MTHFR_C677T",
+    "MTHFR_A1298C",
+    "MTHFD1_R653Q",
+    "MTR_A2756G",
+    "MTRR_A66G",
+    "CBS_844ins68",
+    "DHFR_19del",
+    "FOLR1_var1",
+    "TCN2_C776G",
+    "SHMT1_C1420T",
+    "VANGL1_var1",
+    "VANGL1_var2",
+    "VANGL2_var1",
+    "VANGL2_var2",
+    "CELSR1_var1",
+    "CELSR1_var2",
+    "SCRIB_var1",
+    "FZD6_var1",
+    "DVL2_var1",
+    "PRICKLE1_var1",
+    "WNT3A_var1",
+    "WNT5A_var1",
+    "PAX3_var1",
+    "SHH_var1",
+    "T_BRACHYURY",
+    "GRHL3_var1",
+    "ZIC2_var1",
+    "TBXT_var1"
+  ],
+  "expression_features": [
+    "MTHFR_expr",
+    "MTHFD1_expr",
+    "DHFR_expr",
+    "FOLR1_expr",
+    "VANGL1_expr",
+    "VANGL2_expr",
+    "CELSR1_expr",
+    "SCRIB_expr",
+    "PAX3_expr",
+    "SHH_expr",
+    "WNT3A_expr",
+    "WNT5A_expr",
+    "GRHL3_expr",
+    "ZIC2_expr",
+    "FZD6_expr",
+    "NODAL_expr",
+    "LEFTY2_expr",
+    "FOXE1_expr",
+    "PTCH1_expr",
+    "GLI3_expr"
+  ],
+  "snp_metadata": {
+    "MTHFR_C677T": {
+      "maf": 0.25,
+      "desc": "MTHFR C677T (rs1801133)"
+    },
+    "MTHFR_A1298C": {
+      "maf": 0.3,
+      "desc": "MTHFR A1298C (rs1801131)"
+    },
+    "MTHFD1_R653Q": {
+      "maf": 0.22,
+      "desc": "MTHFD1 R653Q (rs2236225)"
+    },
+    "MTR_A2756G": {
+      "maf": 0.18,
+      "desc": "MTR A2756G (rs1805087)"
+    },
+    "MTRR_A66G": {
+      "maf": 0.35,
+      "desc": "MTRR A66G (rs1801394)"
+    },
+    "CBS_844ins68": {
+      "maf": 0.1,
+      "desc": "CBS 844ins68"
+    },
+    "DHFR_19del": {
+      "maf": 0.15,
+      "desc": "DHFR 19bp deletion"
+    },
+    "FOLR1_var1": {
+      "maf": 0.08,
+      "desc": "FOLR1 variant"
+    },
+    "TCN2_C776G": {
+      "maf": 0.2,
+      "desc": "TCN2 C776G (rs1801198)"
+    },
+    "SHMT1_C1420T": {
+      "maf": 0.28,
+      "desc": "SHMT1 C1420T (rs1979277)"
+    },
+    "VANGL1_var1": {
+      "maf": 0.03,
+      "desc": "VANGL1 rare variant"
+    },
+    "VANGL1_var2": {
+      "maf": 0.05,
+      "desc": "VANGL1 missense"
+    },
+    "VANGL2_var1": {
+      "maf": 0.02,
+      "desc": "VANGL2 rare variant"
+    },
+    "VANGL2_var2": {
+      "maf": 0.04,
+      "desc": "VANGL2 missense"
+    },
+    "CELSR1_var1": {
+      "maf": 0.06,
+      "desc": "CELSR1 rare variant"
+    },
+    "CELSR1_var2": {
+      "maf": 0.08,
+      "desc": "CELSR1 missense"
+    },
+    "SCRIB_var1": {
+      "maf": 0.04,
+      "desc": "SCRIB rare variant"
+    },
+    "FZD6_var1": {
+      "maf": 0.07,
+      "desc": "FZD6 variant"
+    },
+    "DVL2_var1": {
+      "maf": 0.05,
+      "desc": "DVL2 variant"
+    },
+    "PRICKLE1_var1": {
+      "maf": 0.06,
+      "desc": "PRICKLE1 variant"
+    },
+    "WNT3A_var1": {
+      "maf": 0.1,
+      "desc": "WNT3A variant"
+    },
+    "WNT5A_var1": {
+      "maf": 0.12,
+      "desc": "WNT5A variant"
+    },
+    "PAX3_var1": {
+      "maf": 0.05,
+      "desc": "PAX3 missense"
+    },
+    "SHH_var1": {
+      "maf": 0.03,
+      "desc": "SHH regulatory variant"
+    },
+    "T_BRACHYURY": {
+      "maf": 0.08,
+      "desc": "T/Brachyury variant"
+    },
+    "GRHL3_var1": {
+      "maf": 0.06,
+      "desc": "GRHL3 variant"
+    },
+    "ZIC2_var1": {
+      "maf": 0.04,
+      "desc": "ZIC2 variant"
+    },
+    "TBXT_var1": {
+      "maf": 0.09,
+      "desc": "TBXT variant"
+    }
+  },
+  "pathways": {
+    "folate": [
+      "MTHFR_C677T",
+      "MTHFR_A1298C",
+      "MTHFD1_R653Q",
+      "MTR_A2756G",
+      "MTRR_A66G",
+      "CBS_844ins68",
+      "DHFR_19del",
+      "FOLR1_var1",
+      "TCN2_C776G",
+      "SHMT1_C1420T"
+    ],
+    "pcp": [
+      "VANGL1_var1",
+      "VANGL1_var2",
+      "VANGL2_var1",
+      "VANGL2_var2",
+      "CELSR1_var1",
+      "CELSR1_var2",
+      "SCRIB_var1",
+      "FZD6_var1",
+      "DVL2_var1",
+      "PRICKLE1_var1"
+    ],
+    "other": [
+      "WNT3A_var1",
+      "WNT5A_var1",
+      "PAX3_var1",
+      "SHH_var1",
+      "T_BRACHYURY",
+      "GRHL3_var1",
+      "ZIC2_var1",
+      "TBXT_var1"
+    ]
+  },
+  "top_biomarkers": [
+    {
+      "name": "FOLR1_expr",
+      "importance": 0.0851
+    },
+    {
+      "name": "MTHFR_C677T",
+      "importance": 0.0809
+    },
+    {
+      "name": "MTHFR_expr",
+      "importance": 0.0664
+    },
+    {
+      "name": "SHH_expr",
+      "importance": 0.0446
+    },
+    {
+      "name": "VANGL1_expr",
+      "importance": 0.0384
+    },
+    {
+      "name": "FOXE1_expr",
+      "importance": 0.0369
+    },
+    {
+      "name": "MTHFR_A1298C",
+      "importance": 0.0346
+    },
+    {
+      "name": "SCRIB_expr",
+      "importance": 0.0346
+    },
+    {
+      "name": "GLI3_expr",
+      "importance": 0.0344
+    },
+    {
+      "name": "ZIC2_expr",
+      "importance": 0.0337
+    },
+    {
+      "name": "NODAL_expr",
+      "importance": 0.0336
+    },
+    {
+      "name": "CELSR1_expr",
+      "importance": 0.0334
+    },
+    {
+      "name": "PAX3_expr",
+      "importance": 0.0328
+    },
+    {
+      "name": "Unnamed: 0",
+      "importance": 0.0328
+    },
+    {
+      "name": "WNT5A_expr",
+      "importance": 0.0326
+    }
+  ],
+  "feature_importance": {
+    "FOLR1_expr": 0.085127,
+    "MTHFR_C677T": 0.080877,
+    "MTHFR_expr": 0.066449,
+    "SHH_expr": 0.044602,
+    "VANGL1_expr": 0.038433,
+    "FOXE1_expr": 0.036929,
+    "MTHFR_A1298C": 0.034616,
+    "SCRIB_expr": 0.034577,
+    "GLI3_expr": 0.03443,
+    "ZIC2_expr": 0.033654,
+    "NODAL_expr": 0.033575,
+    "CELSR1_expr": 0.033389,
+    "PAX3_expr": 0.032849,
+    "Unnamed: 0": 0.032754,
+    "WNT5A_expr": 0.032647,
+    "GRHL3_expr": 0.032548,
+    "MTHFD1_expr": 0.032478,
+    "DHFR_expr": 0.032193,
+    "WNT3A_expr": 0.031501,
+    "VANGL2_expr": 0.031335,
+    "FZD6_expr": 0.031311,
+    "LEFTY2_expr": 0.031151,
+    "PTCH1_expr": 0.030136,
+    "MTHFD1_R653Q": 0.00813,
+    "FZD6_var1": 0.007283,
+    "MTRR_A66G": 0.006469,
+    "TCN2_C776G": 0.006375,
+    "SCRIB_var1": 0.005703,
+    "SHMT1_C1420T": 0.005675,
+    "MTR_A2756G": 0.004753,
+    "DHFR_19del": 0.004727,
+    "WNT5A_var1": 0.004265,
+    "VANGL2_var2": 0.003714,
+    "T_BRACHYURY": 0.003694,
+    "CELSR1_var1": 0.003443,
+    "CELSR1_var2": 0.003349,
+    "CBS_844ins68": 0.003301,
+    "WNT3A_var1": 0.00292,
+    "PRICKLE1_var1": 0.002509,
+    "TBXT_var1": 0.002331,
+    "FOLR1_var1": 0.002083,
+    "VANGL1_var1": 0.002075,
+    "GRHL3_var1": 0.00201,
+    "PAX3_var1": 0.001763,
+    "ZIC2_var1": 0.001464,
+    "DVL2_var1": 0.00139,
+    "VANGL1_var2": 0.001232,
+    "VANGL2_var1": 0.001054,
+    "SHH_var1": 0.000728
+  }
+}

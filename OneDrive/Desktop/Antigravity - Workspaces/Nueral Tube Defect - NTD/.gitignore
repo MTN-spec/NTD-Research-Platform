@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Data (EXCLUDE LARGE RAW GENOMIC DATA FOR GITHUB)
+data/raw/*.vcf.gz
+data/raw/full/
+*.vcf.gz
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+
+# Research Artifacts
+webapp/model/researcher_feedback.json
+
+# Keep processed data and model artifacts
+!data/processed/ntd_features.csv
+!webapp/model/*.joblib
+!webapp/model/feature_config.json
+!webapp/model/training_metrics.json

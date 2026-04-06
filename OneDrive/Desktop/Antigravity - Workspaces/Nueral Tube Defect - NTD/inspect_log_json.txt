@@ -1,0 +1,26 @@
+[
+    {
+        "file": "ALL.chr1.genotypes_MTHFR.vcf.gz",
+        "size": 559631588,
+        "status": "valid",
+        "header": "##fileformat=VCFv4.1"
+    },
+    {
+        "file": "ALL.chr11.genotypes_FOLR1.vcf.gz",
+        "size": 0,
+        "status": "too small",
+        "snippet": "b''"
+    },
+    {
+        "file": "ALL.chr5.genotypes_DHFR.vcf.gz",
+        "size": 0,
+        "status": "too small",
+        "snippet": "b''"
+    },
+    {
+        "file": "GTEx_median_tpm.gct.gz",
+        "size": 256,
+        "status": "too small",
+        "snippet": "b\"<?xml version='1.0' encoding='UTF-8'?><Error><Code\""
+    }
+]

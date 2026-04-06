@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Machine Learning-Based Prediction of Neural Tube Defect Risk Using Transcriptomic and Genomic Data">
+    <title>NTD Risk Predictor — ML-Based Neural Tube Defect Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- ========== NAVBAR ========== -->
+        <nav class="navbar">
+            <a href="#" class="navbar-brand">
+                <div class="navbar-logo">🧬</div>
+                <div>
+                    <div class="navbar-title">NTD Predictor</div>
+                    <div class="navbar-subtitle">Genomic Risk Analysis</div>
+                </div>
+            </a>
+            <div class="navbar-links">
+                <a href="#predict" class="nav-link active">Predict</a>
+                <a href="#biomarkers" class="nav-link">Biomarkers</a>
+                <a href="#metrics" class="nav-link">Model</a>
+                <a href="#methodology" class="nav-link">Methods</a>
+            </div>
+        </nav>
+
+        <!-- ========== HERO ========== -->
+        <section class="hero">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                ML Model Active — {{ config.model_type }}
+            </div>
+            <h1>
+                Neural Tube Defect<br>
+                <span class="gradient-text">Risk Prediction</span>
+            </h1>
+            <p class="subtitle">
+                Integrating transcriptomic and genomic data from 1000 Genomes &amp; GTEx databases 
+                using machine learning to predict NTD susceptibility and identify novel biomarkers.
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">{{ config.feature_names|length }}</div>
+                    <div class="hero-stat-label">Genomic Features</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">{{ config.snp_features|length }}</div>
+                    <div class="hero-stat-label">SNP Variants</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">{{ config.expression_features|length }}</div>
+                    <div class="hero-stat-label">Expression Genes</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">3</div>
+                    <div class="hero-stat-label">Pathways Analysed</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PREDICTION SECTION ========== -->
+        <section class="section" id="predict">
+            <div class="section-header">
+                <div class="section-icon">🔬</div>
+                <div>
+                    <div class="section-title">Genomic Risk Prediction</div>
+                    <div class="section-desc">Configure the genomic profile below and run the ML prediction</div>
+                </div>
+            </div>
+
+            <div class="prediction-grid">
+                <!-- INPUT PANEL -->
+                <div class="card">
+                    <div class="card-title">📊 Genomic Profile Input</div>
+                    
+                    <h4 style="color:var(--accent-emerald);font-size:13px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">
+                        ● Folate / One-Carbon Metabolism Pathway
+                    </h4>
+                    
+                    {% for snp in key_snps %}
+                    {% set meta = config.snp_metadata.get(snp, {}) %}
+                    {% set pathway = 'folate' if snp in config.pathways.folate else ('pcp' if snp in config.pathways.pcp else 'other') %}
+                    
+                    {% if loop.index == 1 %}
+                    <!-- First folate gene -->
+                    {% endif %}
+                    
+                    {% if snp == config.pathways.pcp[0] or (snp in config.pathways.pcp and loop.previtem not in config.pathways.pcp) %}
+                    <h4 style="color:var(--accent-pink);font-size:13px;text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 16px;">
+                        ● Planar Cell Polarity (PCP) Pathway
+                    </h4>
+                    {% endif %}
+                    
+                    {% if snp in config.pathways.other and (loop.previtem not in config.pathways.other if loop.previtem is defined else true) %}
+                    <h4 style="color:var(--accent-amber);font-size:13px;text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 16px;">
+                        ● Developmental / WNT Signalling
+                    </h4>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <div class="form-label">
+                            <span>{{ meta.get('desc', snp) }}</span>
+                            <span class="pathway-tag pathway-{{ pathway }}">{{ pathway }}</span>
+                        </div>
+                        <div class="genotype-radio-group">
+                            <div class="genotype-radio">
+                                <input type="radio" name="{{ snp }}" value="0" id="{{ snp }}_0" checked>
+                                <label for="{{ snp }}_0">
+                                    <span class="geno-code">0</span>
+                                    <span class="geno-desc">Ref/Ref</span>
+                                </label>
+                            </div>
+                            <div class="genotype-radio">
+                                <input type="radio" name="{{ snp }}" value="1" id="{{ snp }}_1">
+                                <label for="{{ snp }}_1">
+                                    <span class="geno-code">1</span>
+                                    <span class="geno-desc">Het</span>
+                                </label>
+                            </div>
+                            <div class="genotype-radio">
+                                <input type="radio" name="{{ snp }}" value="2" id="{{ snp }}_2">
+                                <label for="{{ snp }}_2">
+                                    <span class="geno-code">2</span>
+                                    <span class="geno-desc">Alt/Alt</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <h4 style="color:var(--accent-cyan);font-size:13px;text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 16px;">
+                        ● Gene Expression Levels (log₂ TPM)
+                    </h4>
+
+                    {% for expr in key_expr %}
+                    <div class="form-group">
+                        <div class="form-label">
+                            <span>{{ expr.replace('_expr', '') }} Expression</span>
+                            <span class="range-value" id="{{ expr }}_val">3.5</span>
+                        </div>
+                        <input type="range" class="range-slider" 
+                               name="{{ expr }}" id="{{ expr }}"
+                               min="0" max="8" step="0.1" value="3.5">
+                    </div>
+                    {% endfor %}
+
+                    <button class="btn-predict" id="predictBtn" onclick="runPrediction()">
+                        🧬 Predict NTD Risk
+                    </button>
+                </div>
+
+                <!-- RESULTS PANEL -->
+                <div>
+                    <div class="card results-panel" id="resultsPanel">
+                        <div class="card-title">📈 Prediction Results</div>
+                        
+                        <!-- Risk Gauge -->
+                        <div class="risk-gauge-container">
+                            <div class="risk-gauge">
+                                <svg viewBox="0 0 200 120">
+                                    <path class="gauge-bg" d="M 20 100 A 60 60 0 0 1 180 100" />
+                                    <path class="gauge-fill" id="gaugeFill" 
+                                          d="M 20 100 A 60 60 0 0 1 180 100"
+                                          style="stroke-dasharray: 188.5; stroke-dashoffset: 188.5;" />
+                                </svg>
+                            </div>
+                            <div class="risk-value" id="riskValue">—</div>
+                            <div class="risk-label">Predicted Risk Probability</div>
+                            <div class="risk-category" id="riskCategory">awaiting input</div>
+                        </div>
+
+                        <!-- Feature Importance -->
+                        <div class="mt-24">
+                            <div class="card-title" style="font-size:14px;">🏷️ Top Contributing Features</div>
+                            <div id="featureBars">
+                                <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">
+                                    Run a prediction to see feature contributions
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder before prediction -->
+                    <div class="card" id="resultsPlaceholder">
+                        <div style="text-align:center;padding:60px 20px;">
+                            <div style="font-size:64px;margin-bottom:16px;opacity:0.3;">🧪</div>
+                            <div style="color:var(--text-secondary);font-size:15px;font-weight:500;">
+                                Configure the genomic profile and click<br>"Predict NTD Risk" to see results
+                            </div>
+                            <div style="color:var(--text-muted);font-size:13px;margin-top:8px;">
+                                The model analyses {{ config.feature_names|length }} genomic &amp; transcriptomic features
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== BIOMARKER DISCOVERY ========== -->
+        <section class="section" id="biomarkers">
+            <div class="section-header">
+                <div class="section-icon">🏆</div>
+                <div>
+                    <div class="section-title">Biomarker Discovery</div>
+                    <div class="section-desc">Top predictive genetic features identified by the ML model</div>
+                </div>
+            </div>
+            <div class="grid-4" id="biomarkerGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- ========== MODEL PERFORMANCE ========== -->
+        <section class="section" id="metrics">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div>
+                    <div class="section-title">Model Performance</div>
+                    <div class="section-desc">{{ config.model_type }} evaluation on held-out test set</div>
+                </div>
+            </div>
+            <div class="grid-4">
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.best_model.auc_roc * 100) }}%</div>
+                    <div class="metric-label">AUC-ROC</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.best_model.accuracy * 100) }}%</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.best_model.f1_score * 100) }}%</div>
+                    <div class="metric-label">F1-Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.best_model.recall * 100) }}%</div>
+                    <div class="metric-label">Recall</div>
+                </div>
+            </div>
+
+            <!-- All models comparison -->
+            <div class="card mt-24">
+                <div class="card-title">🔄 Model Comparison</div>
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                    <thead>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <th style="text-align:left;padding:10px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Model</th>
+                            <th style="text-align:center;padding:10px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">AUC-ROC</th>
+                            <th style="text-align:center;padding:10px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Accuracy</th>
+                            <th style="text-align:center;padding:10px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Precision</th>
+                            <th style="text-align:center;padding:10px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">Recall</th>
+                            <th style="text-align:center;padding:10px;color:var(--text-muted);font-size:12px;text-transform:uppercase;">F1</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in metrics.all_models %}
+                        <tr style="border-bottom:1px solid var(--border-color);{% if m.name == metrics.best_model.name %}background:rgba(59,130,246,0.05);{% endif %}">
+                            <td style="padding:10px;font-weight:600;font-family:var(--font-mono);">
+                                {{ m.name }}
+                                {% if m.name == metrics.best_model.name %}
+                                <span style="font-size:10px;background:var(--accent-blue);color:white;padding:2px 6px;border-radius:4px;margin-left:6px;">BEST</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align:center;padding:10px;font-family:var(--font-mono);color:var(--accent-blue);">{{ "%.4f"|format(m.auc_roc) }}</td>
+                            <td style="text-align:center;padding:10px;font-family:var(--font-mono);">{{ "%.4f"|format(m.accuracy) }}</td>
+                            <td style="text-align:center;padding:10px;font-family:var(--font-mono);">{{ "%.4f"|format(m.precision) }}</td>
+                            <td style="text-align:center;padding:10px;font-family:var(--font-mono);">{{ "%.4f"|format(m.recall) }}</td>
+                            <td style="text-align:center;padding:10px;font-family:var(--font-mono);">{{ "%.4f"|format(m.f1_score) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ========== METHODOLOGY ========== -->
+        <section class="section" id="methodology">
+            <div class="section-header">
+                <div class="section-icon">🔧</div>
+                <div>
+                    <div class="section-title">Methodology</div>
+                    <div class="section-desc">ML pipeline for integrated multi-omics NTD prediction</div>
+                </div>
+            </div>
+            <div class="method-steps">
+                <div class="method-step">
+                    <div class="method-step-number">1</div>
+                    <div class="method-step-title">Data Acquisition</div>
+                    <div class="method-step-desc">Genomic variants from 1000 Genomes Project &amp; gene expression from GTEx Consortium</div>
+                </div>
+                <div class="method-step">
+                    <div class="method-step-number">2</div>
+                    <div class="method-step-title">Preprocessing</div>
+                    <div class="method-step-desc">Variant filtering, MAF/HWE QC, TPM normalisation, and additive genotype encoding</div>
+                </div>
+                <div class="method-step">
+                    <div class="method-step-number">3</div>
+                    <div class="method-step-title">Feature Engineering</div>
+                    <div class="method-step-desc">Pathway risk scores, gene-gene interactions, and PCA dimensionality reduction</div>
+                </div>
+                <div class="method-step">
+                    <div class="method-step-number">4</div>
+                    <div class="method-step-title">Model Training</div>
+                    <div class="method-step-desc">Random Forest, XGBoost, and Deep Neural Network with 5-fold stratified CV</div>
+                </div>
+                <div class="method-step">
+                    <div class="method-step-number">5</div>
+                    <div class="method-step-title">Evaluation</div>
+                    <div class="method-step-desc">AUC-ROC, F1-Score, precision/recall analysis on held-out test set</div>
+                </div>
+                <div class="method-step">
+                    <div class="method-step-number">6</div>
+                    <div class="method-step-title">Interpretation</div>
+                    <div class="method-step-desc">Feature importance ranking and SHAP analysis for biomarker discovery</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== DISCLAIMER ========== -->
+        <div class="disclaimer">
+            <div class="disclaimer-icon">⚠️</div>
+            <p>
+                <strong>Research Disclaimer:</strong> This tool is developed for academic and research purposes only as part of a BSc Honours dissertation.
+                It is not validated for clinical diagnostic use. Predictions are based on synthetic data modelling known NTD-associated genetic variants.
+                Always consult qualified healthcare professionals for medical advice.
+            </p>
+        </div>
+
+        <!-- ========== FOOTER ========== -->
+        <footer class="footer">
+            <p>
+                NTD Risk Predictor — BSc Honours Applied Geology Dissertation &copy; 2025<br>
+                Charity Mirriam | Supervisor: Mr Ncube | Faculty of Engineering &amp; Geosciences
+            </p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script>
+        // Hide placeholder when results are shown
+        const observer = new MutationObserver(() => {
+            const resultsPanel = document.getElementById('resultsPanel');
+            const placeholder = document.getElementById('resultsPlaceholder');
+            if (resultsPanel && resultsPanel.classList.contains('visible') && placeholder) {
+                placeholder.style.display = 'none';
+            }
+        });
+        observer.observe(document.getElementById('resultsPanel'), { attributes: true, attributeFilter: ['class'] });
+    </script>
+</body>
+</html>
